@@ -5,6 +5,8 @@ import io
 import json
 import os
 from pathlib import Path
+import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -68,6 +70,25 @@ class ReleasePreparationTests(unittest.TestCase):
             (export.ROOT/'README.md').symlink_to(export.ROOT/'Sources/main.swift')
             with self.assertRaises(SystemExit):
                 export.main()
+
+    def test_swift_wrapper_forwards_args_with_a_clean_toolchain(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scripts, bin_dir = root/'Scripts', root/'bin'
+            scripts.mkdir()
+            bin_dir.mkdir()
+            wrapper = Path(__file__).resolve().parents[2]/'Scripts/swift.sh'
+            shutil.copy2(wrapper, scripts/'swift.sh')
+            (bin_dir/'xcrun').write_text('#!/bin/bash\nprintf "%s\\n" "$FAKE_SWIFT_COMPILER"\n')
+            (bin_dir/'swift').write_text('#!/bin/bash\nprintf "%s\\n" "$@"\n')
+            for shim in bin_dir.iterdir():
+                shim.chmod(0o755)
+            env = {**os.environ, 'PATH': f"{bin_dir}:{os.environ['PATH']}",
+                   'FAKE_SWIFT_COMPILER': str(root/'toolchain/usr/bin/swiftc')}
+            result = subprocess.run(['/bin/bash', str(scripts/'swift.sh'), 'test', '--filter', 'sample case'],
+                                    capture_output=True, text=True, env=env)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.splitlines(), ['test', '--filter', 'sample case'])
 
     def test_normal_release_rejects_lab_environment_before_any_build(self):
         release = module('prepare-release')

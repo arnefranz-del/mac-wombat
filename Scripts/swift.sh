@@ -8,7 +8,7 @@ SWIFT_USR="$(dirname "$(dirname "$SWIFT_COMPILER")")"
 SWIFT_INCLUDE="$SWIFT_USR/include/swift"
 AUTO_MODULE="$SWIFT_INCLUDE/module.modulemap"
 EXPLICIT_MODULE="$SWIFT_INCLUDE/bridging.modulemap"
-EXTRA_ARGS=()
+OVERLAY_PATH=''
 if [[ -f "$AUTO_MODULE" && -f "$EXPLICIT_MODULE" ]] &&
    /usr/bin/grep -q 'module SwiftBridging' "$AUTO_MODULE" &&
    /usr/bin/grep -q 'module SwiftBridging' "$EXPLICIT_MODULE"; then
@@ -26,7 +26,7 @@ empty.write_text('// SwiftBridging is already defined in bridging.modulemap.\n')
     'roots': [{'type': 'file', 'name': sys.argv[2], 'external-contents': str(empty)}]
 }))
 PY
-    EXTRA_ARGS=(-Xswiftc -vfsoverlay -Xswiftc "$OVERLAY_DIR/overlay.json")
+    OVERLAY_PATH="$OVERLAY_DIR/overlay.json"
 fi
 # Some CLT upgrades leave Swift 5 private manifest interfaces alongside Swift 6
 # public interfaces/libraries. Use clean project-local copies of the public API
@@ -73,4 +73,7 @@ fi
 cd "$PROJECT_ROOT"
 SUBCOMMAND="$1"
 shift
-exec swift "$SUBCOMMAND" "${EXTRA_ARGS[@]}" "$@"
+if [[ -n "$OVERLAY_PATH" ]]; then
+    set -- -Xswiftc -vfsoverlay -Xswiftc "$OVERLAY_PATH" "$@"
+fi
+exec swift "$SUBCOMMAND" "$@"

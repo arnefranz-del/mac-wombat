@@ -1,0 +1,29 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15-intel, macos-15]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Swift tests
+        run: ./Scripts/test.sh
+      - name: Installer tests
+        run: python3 -m unittest discover -s Tests/InstallationTests -v
+      - name: Packaging tests
+        run: python3 -m unittest discover -s Tests/ReleasePreparationTests -v
+      - name: Build macOS app bundle
+        run: CONFIGURATION=debug ./Scripts/build.sh

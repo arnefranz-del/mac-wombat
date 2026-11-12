@@ -8,4 +8,6 @@ Bug reports and pull requests are welcome. English and German both work.
 - Use temporary databases, isolated preference suites and fake services in tests. Preserve recorded gaps and the meaning of local interface counts.
 - Keep personal file paths, process names, traffic logs, IP addresses, credentials and SQLite files out of issues and pull requests. Report security problems [privately](SECURITY.md).
 
+The GitHub-hosted Intel job excludes four native bitmap capture tests because its virtual graphics driver aborts in Metal. Run the full suite on a physical Mac for UI changes. The hosted Apple Silicon job runs the full suite.
+
 Project priorities and acceptance checks are in the [roadmap](ROADMAP.md).

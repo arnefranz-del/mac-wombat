@@ -19,8 +19,15 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
-      - name: Swift tests
+      - name: Swift tests on Apple Silicon
+        if: matrix.runner == 'macos-15'
         run: ./Scripts/test.sh
+      # The hosted Intel VM aborts in Metal when tests capture native views.
+      - name: Swift tests on Intel without native bitmap capture
+        if: matrix.runner == 'macos-15-intel'
+        run: >-
+          ./Scripts/test.sh --skip
+          'eachTabRendersAtTheSameNativeSizeInBothAppearances|settingsRetainAScrollContainerForApprovalAndLongErrors|idleRunningAndFinishedRenderCompactlyInBothAppearances|allModesKeepFixedWidthsAndShowOnlyMacRates'
       - name: Installer tests
         run: python3 -m unittest discover -s Tests/InstallationTests -v
       - name: Packaging tests

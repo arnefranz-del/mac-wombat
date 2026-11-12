@@ -19,7 +19,7 @@ The screenshot uses synthetic data. The app UI is currently in German. Home Womb
 
 ## Build locally
 
-This is a **source preview**. A signed public download is planned. You'll need macOS 14 or newer, Apple's Swift 6 tools and Python 3 for packaging. The Swift package has no external dependencies.
+To build the **source preview** locally, you'll need macOS 14 or newer, Apple's Swift 6 tools and Python 3 for packaging. The Swift package has no external dependencies.
 
 ```sh
 git clone https://github.com/arnefranz-del/mac-wombat.git

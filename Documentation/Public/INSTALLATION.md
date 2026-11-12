@@ -1,6 +1,6 @@
 # Local build and updates · Lokaler Build und Updates
 
-The source preview supports building on macOS 14 or newer with Swift 6 and Python 3. A public signed download is planned.
+The source preview supports building on macOS 14 or newer with Swift 6 and Python 3.
 
 ```sh
 ./Scripts/test.sh
@@ -35,6 +35,5 @@ War der Autostart aktiv und macOS erkennt ihn nach dem Update nicht mehr als akt
 | --- | --- |
 | Intel, macOS 14.7 | Local builds and automated tests verified. Isolated update, saved measurement and rollback tested on the preceding Mac-only candidate. |
 | Apple Silicon | Native runtime verification for this preview is open. |
-| Signed distribution | Developer ID, notarization, Gatekeeper and clean-system testing are pending. |
 
-See the [roadmap](../../ROADMAP.md) for the public distribution checklist.
+See the [roadmap](../../ROADMAP.md) for upcoming work.

@@ -17,7 +17,7 @@ Die Historie bleibt auf deinem Mac. Die App hat kein Konto, keine Telemetrie und
 
 ## Lokal bauen
 
-Öffentlich verfügbar ist die **Quellvorschau**. Ein signierter App-Download ist geplant. Für den lokalen Build brauchst du macOS 14 oder neuer, Apples Swift-6-Werkzeuge und Python 3 für das Paket. SwiftPM lädt keine externen Abhängigkeiten.
+Für den lokalen Build der **Quellvorschau** brauchst du macOS 14 oder neuer, Apples Swift-6-Werkzeuge und Python 3 für das Paket. SwiftPM lädt keine externen Abhängigkeiten.
 
 ```sh
 git clone https://github.com/arnefranz-del/mac-wombat.git

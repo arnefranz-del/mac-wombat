@@ -1,35 +1,45 @@
 # Mac Wombat
 
-Mac Wombat zeigt die aktuellen Download- und Uploadraten deines Mac in der Menüleiste. Die native Swift-App liest die Zähler aktiver WLAN- und Ethernet-Schnittstellen und speichert die beobachteten Zeitabschnitte lokal.
+Sieh die aktuellen Download- und Uploadraten deines Macs in der Menüleiste und schau nach, wann dein Mac Daten übertragen hat. Die native Swift-App speichert die Historie lokal in SQLite und unterstützt benannte Messungen und den CSV-Export.
 
-[English](README.md) · [Website-Quellen](Website/) · [Fahrplan](ROADMAP.md) · [Aufgaben und Fehlerberichte](https://github.com/arnefranz-del/mac-wombat/issues)
+[English](README.md) · [Projektwebsite](https://mac-wombat.pages.dev/) · [Fahrplan](ROADMAP.md) · [Aufgaben und Fehlerberichte](https://github.com/arnefranz-del/mac-wombat/issues)
+
+<img src="Website/assets/mac-preview.png" width="350" alt="Mac Wombat zeigt Live-Raten, Zeitfilter, das Verbrauchsdiagramm und die Steuerung für Messungen">
+
+*Native App-Ansicht mit synthetischen Beispieldaten.*
 
 ## Funktionen
 
-- Live-Raten in der Menüleiste, mit drei Anzeigegrößen.
-- Verbrauchsverlauf für Stunde, Tag, Woche, Monat, Jahr und den gesamten erfassten Zeitraum.
-- Manuelle oder zeitlich begrenzte Messungen, gespeicherte Ergebnisse und CSV-Export.
-- Begrenzte Momentaufnahme des Programmverkehrs über macOS `nettop`.
+- Live-Raten in drei Menüleistengrößen im Blick behalten.
+- Die erfasste Historie nach Stunde, Tag, Woche, Monat, Jahr oder über den gesamten Zeitraum ansehen. Unbeobachtete Zeit bleibt als Lücke sichtbar.
+- Messungen mit Timer oder manuell starten und unter einem Namen speichern. Die reguläre Minutenhistorie lässt sich in den Einstellungen als CSV exportieren.
+- Im Tab **Programme** eine begrenzte Momentaufnahme des Programmverkehrs ansehen.
 
-Die Historie bleibt auf deinem Mac. Die App hat kein Konto, keine Telemetrie und keine Synchronisierung. Schlaf und nicht erfasste Zeit bleiben als Lücken sichtbar. Lokaler Verkehr und VPN-Transport auf physischen Schnittstellen können mitgezählt werden. Programmwerte sind eine Momentaufnahme. [Datenschutz](PRIVACY.md) · [Messgrenzen](Documentation/Public/ARCHITECTURE.md)
-
-![Mac Wombat mit synthetischen Beispieldaten](Documentation/Public/screenshots/mac-light.png)
+Mac Wombat liest die Zähler aktiver WLAN- und Ethernet-Schnittstellen. Die Summen können lokalen Verkehr und VPN-Transport enthalten. Sie zeigen zeitliche Muster und sind für Abrechnungen ungeeignet. Die App speichert die Historie lokal und arbeitet ohne Konto, Telemetrie oder Cloud-Synchronisierung. [Messgrenzen](Documentation/Public/ARCHITECTURE.md#deutsch) · [Datenschutz](PRIVACY.md#deutsch)
 
 ## Lokal bauen
 
-Für den lokalen Build der **Quellvorschau** brauchst du macOS 14 oder neuer, Apples Swift-6-Werkzeuge und Python 3 für das Paket. SwiftPM lädt keine externen Abhängigkeiten.
+Mac Wombat ist als **Quellvorschau unter MIT-Lizenz** verfügbar. Die App ist für macOS 14 oder neuer ausgelegt. Zum Bauen benötigst du Apples Swift-6-Werkzeuge und Python 3 für das App-Paket. Das Swift-Paket hat keine externen Abhängigkeiten.
 
 ```sh
+xcrun swift --version
+python3 --version
 git clone https://github.com/arnefranz-del/mac-wombat.git
 cd mac-wombat
 ./Scripts/test.sh
 ./Scripts/build.sh
 ```
 
-Die lokal ad hoc signierte App liegt unter `build/products.noindex/Wombat.app`. Vor dem Austausch einer bestehenden App die [Installations- und Update-Anleitung](Documentation/Public/INSTALLATION.md) lesen. Intel wurde unter macOS 14.7 getestet. Die native Laufzeitprüfung dieses Quellstands auf Apple Silicon steht aus.
+Die lokal ad hoc signierte App liegt unter `build/products.noindex/Wombat.app`. Ohne vorhandene Installation kannst du das gebaute Paket direkt öffnen. Wenn Wombat schon installiert ist, nutze vor dem Wechsel die [Anleitung für Updates und Rollback](Documentation/Public/INSTALLATION.md#deutsch).
+
+| Umgebung | Geprüft |
+| --- | --- |
+| Intel-Mac, macOS 14.7 | Lokaler Build und vollständige automatisierte Suite, einschließlich nativer Bitmap-Tests. |
+| GitHub-Runner, macOS 15 auf Intel und Apple Silicon | Build und automatisierte Tests auf beiden Architekturen in [Lauf 43214835228](https://github.com/arnefranz-del/mac-wombat/actions/runs/43214835228). Auf dem gehosteten Intel-Runner werden vier Bitmap-Tests übersprungen. |
+| Physischer Mac mit Apple Silicon | Interaktive Bedienung, Ruhezustand und Aufwachen, Anmeldung, Update und Rollback stehen zur Prüfung aus. |
 
 ## Mitmachen
 
-Fehler und Ideen gehören in die [GitHub-Issues](https://github.com/arnefranz-del/mac-wombat/issues). Die [Beitragsregeln](CONTRIBUTING.md) erklären, welche Angaben helfen. Sicherheitsbefunde bitte über den [vertraulichen Meldeweg](SECURITY.md) schicken.
+Die [Beitragsregeln](CONTRIBUTING.md) beschreiben, welche Angaben in einem Fehlerbericht helfen. Melde reproduzierbare Fehler und Vorschläge in den [GitHub-Issues](https://github.com/arnefranz-del/mac-wombat/issues). Sicherheitsbefunde gehören in den [vertraulichen Meldeweg](SECURITY.md). Der [Fahrplan](ROADMAP.md) zeigt die nächsten Aufgaben.
 
-[MIT-Lizenz](LICENSE) · [Bildnachweise](Documentation/Public/LICENSING.md)
+[MIT-Lizenz](LICENSE) · [Bild- und Schriftnachweise](Documentation/Public/LICENSING.md) · [Website-Quellen und lokale Vorschau](Documentation/Public/WEBSITE.md)

@@ -59,6 +59,10 @@ struct UtilityTests {
         #expect(text.contains(",67,8,1.000000,teilweise"))
         #expect(try Data(contentsOf: source) == before)
         #expect(throws: UsageError.self) { try UsageCSV.export(source: source, destination: source) }
+        for name in ["USAGE.SQLITE", "usage.sqlite-journal", "usage.sqlite-wal", "usage.sqlite-shm"] {
+            let reserved = folder.appendingPathComponent(name)
+            #expect(throws: UsageError.self) { try UsageCSV.export(source: source, destination: reserved) }
+        }
         #expect(try Data(contentsOf: source) == before)
     }
 
@@ -71,7 +75,14 @@ struct UtilityTests {
         try ledger.record(reading(300, 40), endingAt: start.addingTimeInterval(1))
         #expect(throws: (any Error).self) { try ledger.backupAndReset(in: URL(fileURLWithPath: "/dev/null")) }
         #expect(try ledger.snapshot(selection: .init(period: .allTime), now: start.addingTimeInterval(2)).totals.received == 300)
-        let backup = try ledger.backupAndReset(in: folder.appendingPathComponent("Backups"))
+        let backups = folder.appendingPathComponent("Backups")
+        try FileManager.default.createDirectory(at: backups, withIntermediateDirectories: false,
+                                                attributes: [.posixPermissions: 0o755])
+        let backup = try ledger.backupAndReset(in: backups)
+        for (url, expected) in [(backups, 0o700), (backup, 0o600)] {
+            let permissions = try FileManager.default.attributesOfItem(atPath: url.path)[.posixPermissions] as? NSNumber
+            #expect(permissions?.intValue == expected)
+        }
         let restored = try UsageLedger(location: .file(backup))
         #expect(try restored.snapshot(selection: .init(period: .allTime), now: start.addingTimeInterval(2)).totals.received == 300)
         #expect(try ledger.snapshot(selection: .init(period: .allTime), now: start.addingTimeInterval(2)).totals == .zero)

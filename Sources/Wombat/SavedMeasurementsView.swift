@@ -9,7 +9,9 @@ struct SavedMeasurementsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Gespeicherte Messungen").font(.headline)
             if monitor.savedMeasurements.isEmpty {
-                Text("Noch keine Messung gespeichert.").font(.system(size: 12)).foregroundStyle(.secondary)
+                if monitor.measurementIssue == nil {
+                    Text("Noch keine Messung gespeichert.").font(.system(size: 12)).foregroundStyle(.secondary)
+                }
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 12) {

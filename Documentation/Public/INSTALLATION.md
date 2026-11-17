@@ -1,39 +1,60 @@
-# Local build and updates · Lokaler Build und Updates
+# Local build and updates
 
-The source preview supports building on macOS 14 or newer with Swift 6 and Python 3.
+## Build the source preview
+
+The app’s deployment target is macOS 14.0. The Mac doing the build must also support the installed Apple Swift 6 toolchain. Check `xcrun swift --version` and `python3 --version`. Use Command Line Tools with Swift 6 or an Xcode version that supplies it. [Apple's Xcode system requirements](https://developer.apple.com/xcode/system-requirements/)
+
+Clone the repository using the [build instructions](../../README.md#build-locally) and run the checks from the repository root.
 
 ```sh
 ./Scripts/test.sh
 python3 -m unittest discover -s Tests/InstallationTests -v
 python3 -m unittest discover -s Tests/ReleasePreparationTests -v
+python3 -m unittest discover -s Tests/WebsiteTests -v
 ./Scripts/build.sh
 ```
 
-Open `build/products.noindex/Wombat.app` after the build. This is an ad hoc-signed local development build. Use the dedicated update workflow below for a Mac with an existing Wombat installation.
+On a fresh Mac, open `build/products.noindex/Wombat.app`. The script produces an ad hoc-signed local build. Keep Gatekeeper enabled. For an existing Wombat installation, follow the workflow below.
 
-## Existing Wombat installation
+## Update an existing installation
 
-Back up any measurements you want to preserve. Review the installer dry run before replacing the installed app.
+Keep a copy of any data you want to preserve. Review the installed app, source bundle, and destination with the installer dry run. Pass `--destination` if the existing `Wombat.app` is outside `/Applications`.
 
 ```sh
 python3 Scripts/install.py --source build/products.noindex/Wombat.app --dry-run
 ```
 
-Without `--dry-run`, the installer backs up usage data, closes running Wombat instances, replaces the app and retains a rollback copy. It checks the bundle identity and rejects a change of signing method. App versions can have different login registrations, so verify the launch-at-login state after updating.
+Once the paths and signing identity are confirmed, repeat without `--dry-run`. The installer takes consistent SQLite backups, closes Wombat, and verifies the replacement. It retains the preceding app bundle in the path under `previous_bundle_backup` in the result. It rejects a change of signing method or identity.
 
-### Launch at login after an update
+### Launch at login after updating
 
-If launch at login was enabled and macOS stops recognizing the entry, the installer prints a recovery hint. Open **Wombat → Einstellungen → Allgemein** and enable **Beim Anmelden starten**. If macOS asks for approval, use **Anmeldeobjekte öffnen** and approve the entry. The installer leaves activation to you.
+In **Wombat → Einstellungen → Allgemein**, check **Beim Anmelden starten**. If macOS requests approval, choose **Anmeldeobjekte öffnen** and approve it in System Settings. The installer reports when a previously enabled item needs attention.
 
-### Autostart nach dem Update
+### Restore the previous app
 
-War der Autostart aktiv und macOS erkennt ihn nach dem Update nicht mehr als aktiv, weist der Installer darauf hin. Öffne **Wombat → Einstellungen → Allgemein** und aktiviere **Beim Anmelden starten**. Falls macOS eine Freigabe verlangt, nutze **Anmeldeobjekte öffnen**.
+Use the exact `previous_bundle_backup` app path from the successful update as the installer’s source. Start with a dry run.
+
+```sh
+python3 Scripts/install.py --source "/path/to/the/previous/Wombat-backup.app" --dry-run
+```
+
+Review the identity and destination, then repeat without `--dry-run`. The procedure restores the application bundle and preserves the current SQLite history. Database recovery is a separate operation. The installer writes consistent data snapshots before replacement, and the app keeps a backup before a schema migration or manual history reset. Check launch at login again after restoring the app.
 
 ## Compatibility
 
-| Platform | Status |
+| Environment | Evidence |
 | --- | --- |
-| Intel, macOS 14.7 | Local builds and automated tests verified. Isolated update, saved measurement and rollback tested on the preceding Mac-only candidate. |
-| Apple Silicon | Native runtime verification for this preview is open. |
+| Intel, macOS 14.7 | Swift 6.0.3 local build and full automated suite, including native bitmap capture. |
+| Hosted Intel, macOS 15.7.9 | Build, Swift tests with four native bitmap tests skipped, and Python checks. A prior hosted Intel job hit a Metal driver abort during bitmap capture. |
+| Hosted Apple Silicon, macOS 15.8.2 | Build and full Swift suite with Python checks in [run 43214835228](https://github.com/arnefranz-del/mac-wombat/actions/runs/43214835228). |
+| Physical Apple Silicon | Interactive launch, sleep/wake, login and update or rollback remain to be checked. |
 
-See the [roadmap](../../ROADMAP.md) for upcoming work.
+On the later [run 43223912165](https://github.com/arnefranz-del/mac-wombat/actions/runs/43223912165), Intel passed. GitHub did not assign the Apple Silicon job to a hosted runner, so that job ended before running any steps. See the [roadmap](../../ROADMAP.md) for the remaining validation.
+
+## Deutsch
+
+Die App ist für macOS 14.0 oder neuer ausgelegt. Der Build-Mac braucht zusätzlich Apples Swift-6-Werkzeuge und Python 3. Prüfe die Werkzeugversion mit `xcrun swift --version` und folge der [Build-Anleitung](../../README.de.md#lokal-bauen).
+
+Bei einer bestehenden Installation prüfst du Quelle und Ziel zuerst mit `python3 Scripts/install.py --source build/products.noindex/Wombat.app --dry-run`. Der Standardpfad ist `/Applications/Wombat.app`. Bei einer Installation an einem anderen Ort gib diesen Pfad mit `--destination` an. Nach der Prüfung startest du den tatsächlichen Austausch mit demselben Befehl ohne `--dry-run`. Das Skript sichert die Statistik und meldet den Pfad des vorherigen App-Pakets unter `previous_bundle_backup`.
+
+Für ein Rollback gibst du dieses ältere App-Paket als `--source` an und beginnst wieder mit einem Dry Run. Der App-Tausch erhält die aktuelle Statistik. Datenbank-Sicherungen werden gesondert wiederhergestellt. Prüfe danach unter **Einstellungen → Allgemein** die Option **Beim Anmelden starten** und bestätige sie in den Systemeinstellungen, wenn macOS darum bittet.

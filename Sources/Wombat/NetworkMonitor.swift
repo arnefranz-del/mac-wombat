@@ -37,19 +37,28 @@ final class NetworkMonitor: ObservableObject {
     }
     #if DEBUG
     /// Documentation only: no sampler start, disk ledger, process list or router.
-    static func releasePreview(now: Date = Date()) throws -> NetworkMonitor {
+    static func releasePreview() throws -> NetworkMonitor {
         let monitor = NetworkMonitor(storage: .memory)
         let ledger = try UsageLedger(location: .memory)
-        for second in 0..<600 {
-            let rate = UInt64(180_000 + (second % 90) * 8_000)
-            try ledger.record(NetworkReading(download: Double(rate), upload: 42_000,
-                state: .measuring, interval: 1, receivedDelta: rate, sentDelta: 42_000),
-                endingAt: now.addingTimeInterval(Double(second - 600)))
+        let day = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: 1_800_000_000))
+        let hourlyRates: [UInt64] = [14, 38, 20, 66, 51, 0, 10, 36, 120, 78, 43, 0, 58, 27]
+        for (index, rate) in hourlyRates.enumerated() where rate > 0 {
+            let start = day.addingTimeInterval(Double((index + 6) * 3_600))
+            let download = rate * 1_000
+            let upload = download / 5
+            for end in stride(from: 3, through: 3_600, by: 3) {
+                try ledger.record(NetworkReading(download: Double(download), upload: Double(upload),
+                    state: .measuring, interval: 3, receivedDelta: download * 3, sentDelta: upload * 3),
+                    endingAt: start.addingTimeInterval(Double(end)))
+            }
         }
+        try ledger.flush()
+        let now = day.addingTimeInterval(20 * 3_600)
+        let snapshot = try ledger.snapshot(selection: monitor.selection, now: now)
         monitor.statisticsVisible = true
         monitor.setPopoverVisible(true)
         monitor.consume(SampleUpdate(reading: NetworkReading(download: 420_000, upload: 42_000,
-            state: .measuring), interfaces: [], statistics: try ledger.snapshot(selection: monitor.selection, now: now),
+            state: .measuring), interfaces: [], statistics: .init(selection: snapshot.selection, snapshot: snapshot),
             error: nil, storageIssue: nil, temporaryStatistics: false, measurement: nil))
         return monitor
     }
@@ -151,7 +160,7 @@ final class NetworkMonitor: ObservableObject {
     func refreshMeasurements() {
         sampler.loadMeasurements { [weak self] values, error in
             Task { @MainActor [weak self] in
-                if let values { self?.savedMeasurements = values }
+                self?.savedMeasurements = values ?? []
                 self?.measurementIssue = error
             }
         }
@@ -212,7 +221,9 @@ final class NetworkMonitor: ObservableObject {
         if popoverVisible, measurement != latestMeasurement { measurement = latestMeasurement }
         latestStorageIssue = update.storageIssue
         latestTemporaryStatistics = update.temporaryStatistics
-        if statisticsVisible, let stats = update.statistics, stats.selection == selection { statistics = stats }
+        if statisticsVisible, let refresh = update.statistics, refresh.selection == selection {
+            statistics = refresh.snapshot
+        }
         if popoverVisible {
             if storageIssue != latestStorageIssue { storageIssue = latestStorageIssue }
             if temporaryStatistics != latestTemporaryStatistics { temporaryStatistics = latestTemporaryStatistics }

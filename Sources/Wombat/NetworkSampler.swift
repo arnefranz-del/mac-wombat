@@ -3,9 +3,14 @@ import Network
 import WombatCore
 
 struct SampleUpdate: Sendable {
+    struct Statistics: Sendable {
+        let selection: UsageSelection
+        let snapshot: UsageSnapshot?
+    }
+
     let reading: NetworkReading?
     let interfaces: [InterfaceDescriptor]
-    let statistics: UsageSnapshot?
+    let statistics: Statistics?
     let error: String?
     let storageIssue: String?
     let temporaryStatistics: Bool
@@ -122,9 +127,14 @@ final class NetworkSampler: @unchecked Sendable {
         }
     }
 
-    private func statistics(now: Date) -> UsageSnapshot? {
-        do { return try ledger?.snapshot(selection: selection, now: now, calendar: .current) }
-        catch { storageIssue = error.localizedDescription; return nil }
+    private func statistics(now: Date) -> SampleUpdate.Statistics {
+        do {
+            let snapshot = try ledger?.snapshot(selection: selection, now: now, calendar: .current)
+            return .init(selection: selection, snapshot: snapshot)
+        } catch {
+            storageIssue = error.localizedDescription
+            return .init(selection: selection, snapshot: nil)
+        }
     }
 
     private func publishStatistics() {
@@ -279,7 +289,6 @@ final class NetworkSampler: @unchecked Sendable {
             do {
                 _ = try ledger.backupAndReset(in: source.deletingLastPathComponent().appendingPathComponent("Backups", isDirectory: true))
                 calculator.reset(); lastWallSample = nil
-                measurement = nil
                 storageIssue = nil
                 publishStatistics(); publishMeasurement()
                 completion(nil)

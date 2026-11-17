@@ -76,4 +76,4 @@ shift
 if [[ -n "$OVERLAY_PATH" ]]; then
     set -- -Xswiftc -vfsoverlay -Xswiftc "$OVERLAY_PATH" "$@"
 fi
-exec swift "$SUBCOMMAND" "$@"
+exec xcrun swift "$SUBCOMMAND" "$@"

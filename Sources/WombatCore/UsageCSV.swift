@@ -6,9 +6,7 @@ import SQLite3
 /// Missing minutes are emitted as ranges with empty byte fields, never as zero.
 public enum UsageCSV {
     public static func export(source: URL, destination: URL) throws {
-        guard source.isFileURL, destination.isFileURL,
-              source.standardizedFileURL.resolvingSymlinksInPath() != destination.standardizedFileURL.resolvingSymlinksInPath()
-        else { throw UsageError.database("Die Statistikdatei darf nicht überschrieben werden.") }
+        try checkDestination(destination, against: source)
         var db: OpaquePointer?
         guard sqlite3_open_v2(source.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else {
             if let db { sqlite3_close(db) }
@@ -33,11 +31,12 @@ public enum UsageCSV {
         }
         defer { sqlite3_finalize(query) }
         let temporary = destination.deletingLastPathComponent().appendingPathComponent(".wombat-export-\(UUID().uuidString).tmp")
-        guard FileManager.default.createFile(atPath: temporary.path, contents: nil, attributes: [.posixPermissions: 0o600]) else {
+        let descriptor = open(temporary.path, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o600)
+        guard descriptor >= 0 else {
             throw UsageError.database("Exportdatei konnte nicht angelegt werden.")
         }
         defer { try? FileManager.default.removeItem(at: temporary) }
-        let file = try FileHandle(forWritingTo: temporary)
+        let file = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true)
         defer { try? file.close() }
         func write(_ string: String) throws { try file.write(contentsOf: Data(string.utf8)) }
         let formatter = ISO8601DateFormatter()
@@ -65,6 +64,32 @@ public enum UsageCSV {
         guard code == SQLITE_DONE else { throw UsageError.database("Statistikexport wurde beim Lesen unterbrochen.") }
         try file.synchronize()
         try file.close()
+        try checkDestination(destination, against: source)
         guard rename(temporary.path, destination.path) == 0 else { throw UsageError.database("Exportdatei konnte nicht gespeichert werden.") }
+    }
+
+    private static func checkDestination(_ destination: URL, against source: URL) throws {
+        guard source.isFileURL, destination.isFileURL else { throw UsageError.database("Kein lokaler Dateipfad") }
+        let targetDirectory = destination.deletingLastPathComponent()
+        // SQLite may create companion files after the destination was chosen.
+        // Reserve those names even if the files do not exist yet.
+        for base in [source, source.resolvingSymlinksInPath()] {
+            let directory = base.deletingLastPathComponent()
+            let inDatabaseDirectory = sameFile(targetDirectory, directory)
+            for suffix in ["", "-journal", "-wal", "-shm"] {
+                let name = base.lastPathComponent + suffix
+                let protected = directory.appendingPathComponent(name)
+                if destination.path == protected.path || sameFile(destination, protected)
+                    || (inDatabaseDirectory && destination.lastPathComponent.caseInsensitiveCompare(name) == .orderedSame) {
+                    throw UsageError.database("Die Statistikdatei und ihre SQLite-Nebendateien dürfen nicht überschrieben werden.")
+                }
+            }
+        }
+    }
+
+    private static func sameFile(_ first: URL, _ second: URL) -> Bool {
+        var firstInfo = stat(), secondInfo = stat()
+        return stat(first.path, &firstInfo) == 0 && stat(second.path, &secondInfo) == 0
+            && firstInfo.st_dev == secondInfo.st_dev && firstInfo.st_ino == secondInfo.st_ino
     }
 }

@@ -9,11 +9,12 @@ import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS = ['build.sh','test.sh','swift.sh','run.sh','build-icon.py','stage-bundle.py',
-           'bundle_tools.py','install.py','prepare-release.py','export-public-source.py']
+           'bundle_tools.py','install.py','prepare-release.py','export-public-source.py','stage-website.py']
 ROOT_FILES = ['Package.swift','.gitignore','README.md','SECURITY.md','PRIVACY.md',
               'CONTRIBUTING.md','CHANGELOG.md','LICENSE','README.de.md','ROADMAP.md']
 TREES = ['Sources','Tests','Resources','Documentation/Public','Website','.github']
-SUFFIXES = {'.swift','.py','.sh','.plist','.png','.jpg','.yml','.svg','.html','.css','.md','.txt','.iconset'}
+BINARY_SUFFIXES = {'.png','.jpg','.icns','.woff2'}
+SUFFIXES = {'.swift','.py','.sh','.plist','.yml','.svg','.html','.css','.md','.txt','.iconset'} | BINARY_SUFFIXES
 
 
 def main():
@@ -33,7 +34,7 @@ def main():
         if '__pycache__' in source.parts or source.suffix == '.pyc':
             continue
         data = source.read_bytes()
-        if source.suffix not in {'.png','.jpg','.icns'}:
+        if source.suffix not in BINARY_SUFFIXES:
             text = data.decode('utf-8')
             # Patterns deliberately return file/rule only, never a matching secret.
             for label, pattern in {

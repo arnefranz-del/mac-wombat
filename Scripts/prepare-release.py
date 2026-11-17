@@ -51,7 +51,7 @@ def main():
     run(['/usr/bin/codesign', '--verify', '--deep', '--strict', app])
     (output/'READ-ME-FIRST.txt').write_text(
         'LOCAL PREPARATION ONLY — NOT A PUBLIC RELEASE\n'
-        'Ad hoc signed, no Developer ID, no notarization. Asset rights/license pending.\n'
+        'Ad hoc signed for local checks. For licensing, see Documentation/Public/LICENSING.md.\n'
         'Do not distribute or install over the production app without a separate reviewed decision.\n'
         'See Documentation/Public/INSTALLATION.md and RELEASE-CHECKLIST.md in the source preparation.\n')
     zip_path = output/(label+'.zip')

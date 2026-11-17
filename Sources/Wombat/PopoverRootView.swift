@@ -43,7 +43,7 @@ struct PopoverRootView: View {
             }.padding(.bottom, 16)
 
             if let issue = monitor.storageIssue {
-                Label(monitor.temporaryStatistics ? "Statistik nur für diese Sitzung" : "Statistik kann nicht gespeichert werden",
+                Label(monitor.temporaryStatistics ? "Statistik nur für diese Sitzung" : "Problem mit der Statistik",
                       systemImage: "exclamationmark.triangle")
                     .font(.system(size: 10)).foregroundStyle(.orange).help(issue).padding(.bottom, 8)
             }

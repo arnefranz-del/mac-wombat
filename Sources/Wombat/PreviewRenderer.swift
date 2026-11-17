@@ -18,6 +18,10 @@ enum PreviewRenderer {
         let traffic = AppTrafficController()
         let login = LoginItemController(service: PreviewLoginService())
         let display = DisplaySettings(defaults: defaults)
+        let status = StatusRatesView(frame: NSRect(x: 0, y: 0, width: StatusRatesView.width(for: .standard), height: 22))
+        status.appearance = NSAppearance(named: .aqua)
+        status.update(monitor.reading)
+        try renderBitmap(status, to: directory.appendingPathComponent("menu-bar.png"))
         for dark in [false, true] {
             navigation.tab = .statistics
             let view = VStack(spacing: 0) {
@@ -30,7 +34,7 @@ enum PreviewRenderer {
             try renderNative(view, appearance: dark ? .darkAqua : .aqua,
                 to: directory.appendingPathComponent("mac-\(dark ? "dark" : "light").png"))
         }
-        print("Zwei native Dokumentationsbilder mit synthetischen Daten erstellt.")
+        print("Native Dokumentationsbilder für Popover und Menüleiste mit synthetischen Daten erstellt.")
     }
     static func render(to path: String) throws {
         let directory = URL(fileURLWithPath: path, isDirectory: true)

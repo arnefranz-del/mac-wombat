@@ -103,18 +103,8 @@ final class UsageDatabase {
 
     private static func prepare(_ url: URL) throws -> String {
         guard url.isFileURL else { throw UsageError.database("Kein lokaler Dateipfad") }
-        let manager = FileManager.default
-        let folder = url.deletingLastPathComponent()
-        try manager.createDirectory(at: folder, withIntermediateDirectories: true,
-                                    attributes: [.posixPermissions: 0o700])
-        let directory = open(folder.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
-        guard directory >= 0 else { throw UsageError.database("Unsicherer Statistikordner") }
+        let directory = try openPrivateDirectory(url.deletingLastPathComponent(), error: "Unsicherer Statistikordner")
         defer { close(directory) }
-        var info = stat()
-        guard fstat(directory, &info) == 0, info.st_uid == geteuid(),
-              (info.st_mode & S_IFMT) == S_IFDIR, fchmod(directory, 0o700) == 0 else {
-            throw UsageError.database("Unsicherer Statistikordner")
-        }
         // SQLite may open recovery/WAL files itself. Validate those boundaries too,
         // before opening the database; never follow links or chmod their targets.
         for suffix in ["-journal", "-wal", "-shm"] {
@@ -122,6 +112,19 @@ final class UsageDatabase {
         }
         try prepareFile(url.lastPathComponent, directory: directory, create: true)
         return url.path
+    }
+
+    private static func openPrivateDirectory(_ url: URL, error: String) throws -> Int32 {
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true,
+                                                attributes: [.posixPermissions: 0o700])
+        let descriptor = open(url.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+        guard descriptor >= 0 else { throw UsageError.database(error) }
+        var info = stat()
+        guard fstat(descriptor, &info) == 0, info.st_uid == geteuid(), fchmod(descriptor, 0o700) == 0 else {
+            close(descriptor)
+            throw UsageError.database(error)
+        }
+        return descriptor
     }
 
     private static func prepareFile(_ name: String, directory: Int32, create: Bool) throws {
@@ -208,16 +211,18 @@ final class UsageDatabase {
 
     /// Private online backup, verified before any migration or destructive change.
     func backup(to url: URL) throws {
-        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true,
-                                                attributes: [.posixPermissions: 0o700])
-        let fd = open(url.path, O_CREAT | O_EXCL | O_WRONLY, S_IRUSR | S_IWUSR)
+        guard url.isFileURL else { throw UsageError.database("Kein lokaler Dateipfad") }
+        let directory = try Self.openPrivateDirectory(url.deletingLastPathComponent(), error: "Unsicherer Sicherungsordner")
+        defer { close(directory) }
+        let name = url.lastPathComponent
+        let fd = openat(directory, name, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o600)
         guard fd >= 0 else { throw UsageError.database("Sicherung konnte nicht angelegt werden.") }
         close(fd)
         var backupDB: OpaquePointer?
         var backupComplete = false
         defer {
             if let backupDB { sqlite3_close(backupDB) }
-            if !backupComplete { try? FileManager.default.removeItem(at: url) }
+            if !backupComplete { unlinkat(directory, name, 0) }
         }
         guard sqlite3_open_v2(url.path, &backupDB, SQLITE_OPEN_READWRITE, nil) == SQLITE_OK,
               let target = backupDB, let source = handle,

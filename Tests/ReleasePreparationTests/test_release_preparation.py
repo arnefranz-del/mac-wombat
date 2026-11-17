@@ -39,10 +39,12 @@ class ReleasePreparationTests(unittest.TestCase):
             (export.ROOT/'.git/private').write_text('private history fixture')
             (export.ROOT/'usage.sqlite').write_text('private database fixture')
             (export.ROOT/'Sources/main.swift').chmod(0o755)
+            (export.ROOT/'Sources/fixture.woff2').write_bytes(b'wOF2\xff')
             with contextlib.redirect_stdout(io.StringIO()):
                 export.main()
             output = export.ROOT/'build/release-audit/Wombat-source-LOCAL-PREVIEW'
             manifest = json.loads((output/'SOURCE-MANIFEST.json').read_text())
+            self.assertIn('Sources/fixture.woff2', manifest)
             for name, digest in manifest.items():
                 self.assertEqual(hashlib.sha256((output/name).read_bytes()).hexdigest(), digest)
             self.assertFalse((output/'.git').exists())
@@ -79,8 +81,16 @@ class ReleasePreparationTests(unittest.TestCase):
             bin_dir.mkdir()
             wrapper = Path(__file__).resolve().parents[2]/'Scripts/swift.sh'
             shutil.copy2(wrapper, scripts/'swift.sh')
-            (bin_dir/'xcrun').write_text('#!/bin/bash\nprintf "%s\\n" "$FAKE_SWIFT_COMPILER"\n')
-            (bin_dir/'swift').write_text('#!/bin/bash\nprintf "%s\\n" "$@"\n')
+            (bin_dir/'xcrun').write_text(
+                '#!/bin/bash\n'
+                'if [[ "$1" == --find && "$2" == swiftc ]]; then\n'
+                '  printf "%s\\n" "$FAKE_SWIFT_COMPILER"\n'
+                'elif [[ "$1" == swift ]]; then\n'
+                '  shift\n'
+                '  printf "%s\\n" "$@"\n'
+                'else\n'
+                '  exit 2\n'
+                'fi\n')
             for shim in bin_dir.iterdir():
                 shim.chmod(0o755)
             env = {**os.environ, 'PATH': f"{bin_dir}:{os.environ['PATH']}",

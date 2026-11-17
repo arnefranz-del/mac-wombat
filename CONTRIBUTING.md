@@ -1,13 +1,21 @@
 # Contributing to Mac Wombat
 
-Bug reports and pull requests are welcome. English and German both work.
+Bug reports and pull requests are welcome in English and German.
 
-- For a bug, include the Wombat build, macOS version, architecture, expected behavior and steps to reproduce with synthetic data.
-- For an enhancement, open an issue and describe the problem and expected result before starting a large change.
-- Run `./Scripts/test.sh` and the Python tests for any affected packaging or installation code. See the [build guide](README.md#build-locally).
-- Use temporary databases, isolated preference suites and fake services in tests. Preserve recorded gaps and the meaning of local interface counts.
-- Keep personal file paths, process names, traffic logs, IP addresses, credentials and SQLite files out of issues and pull requests. Report security problems [privately](SECURITY.md).
+## Report an issue
 
-The GitHub-hosted Intel job excludes four native bitmap capture tests because its virtual graphics driver aborts in Metal. Run the full suite on a physical Mac for UI changes. The hosted Apple Silicon job runs the full suite.
+Include the commit or build number, macOS version, hardware architecture, expected result, and minimal steps with synthetic data. Use [GitHub Issues](https://github.com/arnefranz-del/mac-wombat/issues) for bugs and proposals. Describe the problem before starting a large change.
 
-Project priorities and acceptance checks are in the [roadmap](ROADMAP.md).
+Keep process names, personal paths, IP addresses, traffic logs, credentials, and SQLite files out of public reports. Use [private reporting](SECURITY.md) for security issues.
+
+## Make a change
+
+- Start with the [local build guide](README.md#build-locally) and [architecture overview](Documentation/Public/ARCHITECTURE.md).
+- Use temporary databases, isolated preference suites, and test services in automated checks. Preserve the difference between measured zero and an observation gap.
+- Run `./Scripts/test.sh` for Swift changes. Run the relevant Python suites from the [installation guide](Documentation/Public/INSTALLATION.md) for packaging or installer changes.
+- If you edit the website, update both language pages and run `python3 -m unittest discover -s Tests/WebsiteTests -v`. Check the [local preview](Documentation/Public/WEBSITE.md) with a keyboard and at desktop and mobile widths.
+- In the pull request, list what you verified and which hardware or macOS combinations still need a check. Include a native screenshot using synthetic data for app UI changes.
+
+GitHub runs checks on both Intel and Apple Silicon. Hosted Intel skips four bitmap capture tests because the virtual graphics driver aborts in Metal. Run the full suite on a physical Mac for UI work.
+
+See the [roadmap](ROADMAP.md) for priorities and acceptance checks.

@@ -3,88 +3,131 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Mac Wombat shows live network rates, local usage history and measurements in the macOS menu bar.">
-  <meta name="theme-color" content="#f4efe3">
-  <title>Mac Wombat · Open source for macOS</title>
-  <link rel="icon" href="../assets/favicon.png" type="image/png">
-  <link rel="alternate" hreflang="de" href="../index.html">
-  <link rel="stylesheet" href="../styles.css">
+  <title>Mac Wombat – Network monitor for the macOS menu bar</title>
+  <meta name="description" content="See live download and upload rates in your macOS menu bar. Explore local usage history, save measurements, and export history as CSV.">
+  <meta name="theme-color" content="#13241c">
+  <link rel="canonical" href="https://mac-wombat.pages.dev/en/">
+  <link rel="alternate" hreflang="de" href="https://mac-wombat.pages.dev/">
+  <link rel="alternate" hreflang="en" href="https://mac-wombat.pages.dev/en/">
+  <link rel="alternate" hreflang="x-default" href="https://mac-wombat.pages.dev/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Mac Wombat">
+  <meta property="og:title" content="Mac Wombat – Your Mac’s network activity in view">
+  <meta property="og:description" content="Live rates in the macOS menu bar, local history, and on-demand measurements. Open source under MIT.">
+  <meta property="og:url" content="https://mac-wombat.pages.dev/en/">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="og:image" content="https://mac-wombat.pages.dev/assets/mac-wombat-social.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Mac Wombat logo and app statistics view with sample data">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <a href="#main" class="skip">Skip to content</a>
-  <header class="shell site-head">
-    <a class="brand" href="#main"><img src="../assets/favicon.png" alt="" width="32" height="32"> Mac Wombat</a>
-    <nav aria-label="Main navigation">
-      <a href="#features">Features</a>
-      <a href="#contribute">Contribute</a>
-      <a class="language" href="../index.html" lang="de" aria-label="Deutsch">DE</a>
-    </nav>
+  <header class="site-header">
+    <div class="shell site-head">
+      <a class="brand" href="/en/"><img src="/assets/favicon.png" alt="" width="34" height="34"> Mac Wombat</a>
+      <nav aria-label="Main navigation">
+        <a href="#features">Features</a>
+        <a href="#local">Privacy</a>
+        <a href="#contribute">Open source</a>
+        <a class="language" href="/" hreflang="de" lang="de" aria-label="Deutsch">DE</a>
+      </nav>
+    </div>
   </header>
   <main id="main" tabindex="-1">
-    <section class="shell hero" aria-labelledby="title">
-      <div class="hero-copy">
-        <p class="eyebrow">Open source for macOS</p>
-        <h1 id="title">Your Mac. <em>Your data usage.</em></h1>
-        <p class="intro">See how fast your Mac sends and receives data in the menu bar. Track usage over time and save individual measurements.</p>
-        <div class="actions">
-          <a class="button" href="https://github.com/arnefranz-del/mac-wombat">Source on GitHub <span aria-hidden="true">↗</span></a>
-          <a class="text-link" href="https://github.com/arnefranz-del/mac-wombat/blob/main/README.md#build-locally">Build guide on GitHub</a>
-        </div>
-        <p class="compatibility">macOS 14+ · Swift · MIT</p>
-      </div>
-      <figure class="hero-photo">
-        <img src="../assets/wombat.jpg" alt="A wombat resting among grasses at dusk" fetchpriority="high">
-      </figure>
-    </section>
-
-    <section class="shell features" id="features" aria-labelledby="features-title">
-      <div class="features-copy">
-        <h2 id="features-title">See it live. Look back later.</h2>
-        <div class="feature-list">
-          <article>
-            <h3>Live in the menu bar</h3>
-            <p>Download and upload rates from active Wi-Fi and Ethernet interfaces.</p>
-          </article>
-          <article>
-            <h3>Usage history</h3>
-            <p>Local history by hour, day and longer periods. Sleep and interruptions appear as gaps.</p>
-          </article>
-          <article>
-            <h3>Measurements and CSV</h3>
-            <p>Start a measurement, save the result and export your usage history as CSV.</p>
-          </article>
-        </div>
-        <p class="limits">Mac Wombat reads counters on physical interfaces. Local traffic and VPN traffic carried by those interfaces can be included. Usage totals are not billing records. Per-app figures are a snapshot.</p>
-      </div>
-      <figure class="app-preview">
-        <img src="../assets/mac-preview.png" alt="Mac Wombat showing live rates, usage history and measurement controls with sample data" width="840" height="1314" loading="lazy">
-        <figcaption>App preview with synthetic data. The app UI is currently in German.</figcaption>
-      </figure>
-    </section>
-
-    <div class="footer-band">
-      <section class="shell last-section" id="contribute" aria-labelledby="join-title">
-        <div>
-          <h2>Your history stays on your Mac.</h2>
-          <p>Wombat stores usage history locally. There is no Wombat account, telemetry or cloud sync.</p>
-        </div>
-        <div>
-          <h2 id="join-title">Help build Wombat.</h2>
-          <p>Try the source preview and report bugs or suggest improvements on GitHub.</p>
+    <section class="hero" aria-labelledby="title">
+      <div class="shell hero-layout">
+        <div class="hero-copy">
+          <p class="eyebrow">Network monitor for macOS</p>
+          <h1 id="title">Your Mac’s traffic. <span>In clear view.</span></h1>
+          <p class="intro">See live download and upload rates in your menu bar. Look back at when your Mac transferred data and save measurements of your own.</p>
           <div class="actions">
-            <a class="button" href="https://github.com/arnefranz-del/mac-wombat/issues">Issues on GitHub <span aria-hidden="true">↗</span></a>
-            <a class="text-link" href="https://github.com/arnefranz-del/mac-wombat/blob/main/ROADMAP.md">Roadmap</a>
+            <a class="button" href="https://github.com/arnefranz-del/mac-wombat">Source on GitHub <span aria-hidden="true">↗</span></a>
+            <a class="text-link" href="https://github.com/arnefranz-del/mac-wombat/blob/main/README.md#build-locally">Build guide <span aria-hidden="true">↗</span></a>
           </div>
+          <p class="availability">Build from source · macOS 14+ · German app UI</p>
         </div>
-      </section>
-    </div>
+        <figure class="demo">
+          <div class="demo-images">
+            <div class="status-shot">
+              <img src="/assets/menu-bar.png" alt="Mac Wombat’s menu bar item showing download and upload rates" width="330" height="44" decoding="async">
+            </div>
+            <img class="app-shot" src="/assets/mac-preview.png"
+              srcset="/assets/mac-preview-420.png 420w, /assets/mac-preview.png 840w"
+              sizes="(max-width: 410px) calc(100vw - 64px), 352px"
+              alt="Mac Wombat’s German statistics view with live rates, time filters, a usage chart, and a control to start a measurement"
+              width="840" height="1314" fetchpriority="high" decoding="async">
+          </div>
+          <figcaption>Native app view · Synthetic sample data</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="shell section features" id="features" aria-labelledby="features-title">
+      <h2 id="features-title">See it live. Look back later.</h2>
+      <div class="feature-list">
+        <article>
+          <h3>Rates in the menu bar</h3>
+          <p>Keep an eye on current download and upload rates. Choose from three layouts to control how much space Mac Wombat takes in your menu bar.</p>
+        </article>
+        <article>
+          <h3>Usage over time</h3>
+          <p>Browse your history by hour, day, week, month, year, or all recorded time. Sleep and other unobserved intervals appear as gaps.</p>
+        </article>
+        <article>
+          <h3>On-demand measurements</h3>
+          <p>Record activity during a transfer. Set a timer or stop manually, then save the result in the app. Export your regular usage history as CSV.</p>
+        </article>
+      </div>
+      <div class="reading-guide">
+        <div>
+          <h3>What gets counted</h3>
+          <p>Mac Wombat reads counters from active Wi-Fi and Ethernet interfaces. That can include local network traffic and VPN traffic carried on those interfaces.</p>
+        </div>
+        <details>
+          <summary>Measurement limits and per-app traffic</summary>
+          <p>Totals reflect observed interface traffic and are unsuitable for billing. The <span lang="de">Programme</span> tab shows a limited snapshot of per-app traffic. It keeps no per-app history.</p>
+          <a class="text-link" href="https://github.com/arnefranz-del/mac-wombat/blob/main/Documentation/Public/ARCHITECTURE.md">How Mac Wombat measures traffic <span aria-hidden="true">↗</span></a>
+        </details>
+      </div>
+    </section>
+
+    <section class="local" id="local" aria-labelledby="local-title">
+      <div class="shell section text-split">
+        <h2 id="local-title">Your history stays on your Mac.</h2>
+        <div>
+          <p>History and saved measurements live in a local SQLite database. Mac Wombat works without an account, telemetry, or cloud sync. A CSV file is created when you choose to export it.</p>
+          <a class="text-link" href="https://github.com/arnefranz-del/mac-wombat/blob/main/PRIVACY.md">App privacy and storage <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell section contribute" id="contribute" aria-labelledby="contribute-title">
+      <div>
+        <p class="eyebrow">Open source · MIT license</p>
+        <h2 id="contribute-title">Build Mac Wombat on your Mac.</h2>
+        <p>Build the source preview with Swift 6, try it out, and share bug reports or ideas on GitHub.</p>
+        <div class="actions">
+          <a class="button" href="https://github.com/arnefranz-del/mac-wombat/blob/main/README.md#build-locally">Build the preview <span aria-hidden="true">↗</span></a>
+          <a class="text-link" href="https://github.com/arnefranz-del/mac-wombat/issues">Browse GitHub issues <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <img class="mascot" src="/assets/wombat.jpg" alt="" width="448" height="448" loading="lazy" decoding="async">
+    </section>
   </main>
-  <div class="footer-band">
-      <footer class="shell site-foot">
-        <p>Mac Wombat · An independent macOS project.</p>
+  <footer class="site-footer">
+    <div class="shell site-foot">
+      <a class="brand" href="/en/"><img src="/assets/favicon.png" alt="" width="30" height="30"> Mac Wombat</a>
+      <nav aria-label="Project and legal">
+        <a href="https://github.com/arnefranz-del/mac-wombat/blob/main/ROADMAP.md">Roadmap</a>
         <a href="https://github.com/arnefranz-del/mac-wombat/blob/main/LICENSE">MIT license</a>
-        <a href="https://github.com/arnefranz-del/mac-wombat/blob/main/Documentation/Public/LICENSING.md">Image credits</a>
-      </footer>
-  </div>
+        <a href="https://mac-wombat.pages.dev/en/legal/">Legal notice</a>
+        <a href="https://mac-wombat.pages.dev/en/privacy/">Website privacy</a>
+      </nav>
+    </div>
+  </footer>
 </body>
 </html>

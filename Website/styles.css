@@ -134,7 +134,7 @@ a:hover { text-decoration-thickness: 0.13em; }
 .hero .eyebrow { color: #b9cfb9; }
 
 h1 {
-  font-size: clamp(2.8rem, 5.35vw, 5.2rem);
+  font-size: clamp(2.8rem, 5.35vw, 4.65rem);
   font-weight: 650;
   letter-spacing: -0.045em;
   line-height: 1.01;
@@ -326,7 +326,7 @@ h3 {
 
 @media (max-width: 54rem) {
   .hero-layout { grid-template-columns: minmax(0, 1fr); }
-  h1 { font-size: clamp(2.5rem, 10.8vw, 4.9rem); }
+  h1 { font-size: clamp(2.2rem, 10.8vw, 4.9rem); }
   .demo { inline-size: min(100%, 36rem); }
 }
 
